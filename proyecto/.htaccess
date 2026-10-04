@@ -1,0 +1,6 @@
+RewriteEngine On
+# Ignorar si el archivo o carpeta existe físicamente
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+# Enviar todo lo demás al index.php
+RewriteRule ^(.*)$ index.php?views=$1 [L]
