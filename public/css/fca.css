@@ -1,0 +1,52 @@
+:root {
+    --fca-wine: #7A1A2E;
+    --fca-wine-dark: #5C1423;
+    --fca-wine-deep: #3D0C17;
+    --fca-black: #1A1A1A;
+    --fca-white: #FFFFFF;
+    --fca-cream: #F7F4F5;
+}
+
+body { font-family: 'Poppins', sans-serif; }
+
+.fca-grad {
+    background: linear-gradient(135deg, #7A1A2E 0%, #5C1423 55%, #3D0C17 100%);
+}
+.metallic {
+    background: linear-gradient(180deg, #8B2238 0%, #7A1A2E 45%, #5C1423 100%);
+    box-shadow: 0 8px 24px rgba(122, 26, 46, 0.35);
+}
+.glossy {
+    background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 100%);
+}
+.chrome-text {
+    color: #FFFFFF;
+    -webkit-text-fill-color: #FFFFFF;
+    background: none;
+    filter: none;
+}
+.rounded-chrome { font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+.glow-wine { box-shadow: 0 0 28px rgba(122, 26, 46, 0.45); }
+.glow-gold { box-shadow: 0 0 20px rgba(122, 26, 46, 0.25); }
+.glow-green { box-shadow: 0 0 20px rgba(22, 101, 52, 0.4); }
+.text-glow { text-shadow: none; }
+.bg-dark-modern { background: #F7F4F5; color: #1A1A1A; }
+.y2k-border { border: 2px solid #7A1A2E; }
+.modal-backdrop { background: rgba(26, 26, 26, 0.55); backdrop-filter: blur(8px); }
+.toast { transition: all 0.4s ease; }
+.logo-card {
+    background: #FFFFFF;
+    border: 1px solid #E6DEE1;
+    box-shadow: 0 8px 24px rgba(122, 26, 46, 0.12);
+}
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.cal-cell { min-height: 110px; }
+.cal-event {
+    font-size: 10px;
+    line-height: 1.25;
+    border-radius: 8px;
+    padding: 3px 6px;
+    margin-top: 4px;
+    background: #7A1A2E;
+    color: #FFFFFF;
+}

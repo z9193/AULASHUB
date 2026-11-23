@@ -1,225 +1,109 @@
 <?php require __DIR__ . '/helpers.php'; ?>
 <?php require __DIR__ . '/partials/header.php'; ?>
-<style>
-    .chrome-text {
-        background: linear-gradient(180deg, #fef3c7 0%, #fcd34d 25%, #f59e0b 50%, #d97706 75%, #b45309 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        text-shadow: 0 0 20px rgba(245, 158, 11, 0.8), 0 0 40px rgba(245, 158, 11, 0.4);
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-    }
-    .rounded-chrome {
-        font-weight: 800;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-    }
-</style>
 
-<main class="max-w-6xl mx-auto px-6 py-8 relative z-10">
-    <section class="bg-slate-900/80 backdrop-blur-xl rounded-3xl y2k-border glow-purple p-8">
-        <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-purple-500/30">
-            <div>
-                <h2 class="text-xl font-black tracking-wide chrome-text rounded-chrome flex items-center gap-2">
-                    <span>🛠️</span> Centro de Control Administrativo
-                </h2>
-                <p class="text-xs text-purple-300 mt-1">Administra reservas, asigna insumos y controla métricas en tiempo real.</p>
-            </div>
-            <div class="flex gap-3">
-                <button onclick="abrirModalReserva()"
-                    class="uach-grad hover:opacity-95 text-white font-bold text-xs px-5 py-3 rounded-2xl shadow-lg shadow-purple-500/50 transition transform hover:-translate-y-0.5 glow-purple">
-                    ➕ Nueva Reserva
-                </button>
-                <button onclick="simularRecordatorio()"
-                    class="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-bold text-xs px-5 py-3 rounded-2xl shadow-lg shadow-yellow-500/50 transition transform hover:-translate-y-0.5 glow-yellow">
-                    ⏰ Lanzar Alarma
-                </button>
-            </div>
+<main class="max-w-7xl mx-auto px-6 py-8 relative z-10">
+    <section class="bg-white backdrop-blur-xl rounded-3xl y2k-border glow-wine p-8 mb-8">
+        <div class="mb-6 pb-4 border-b border-[#7A1A2E]/30">
+            <h2 class="text-xl font-black tracking-wide text-[#7A1A2E]">Panel administrativo</h2>
+            <p class="text-xs text-[#7A1A2E] mt-1"><?= htmlspecialchars($facultad) ?> · métricas, reservas y salas.</p>
         </div>
 
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div class="bg-gradient-to-br from-purple-900/60 to-purple-800/40 border-2 border-purple-500/50 rounded-2xl p-5 shadow-lg glow-purple">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-purple-300">Espacios</p>
-                <p id="metricaTotalEspacios" class="text-3xl font-extrabold text-yellow-400 text-glow mt-1"><?= (int)$metricas['totalEspacios'] ?></p>
-                <p class="text-xs text-purple-300 mt-1">Auditorio y Aula Virtual</p>
+            <button type="button" onclick="abrirModalReserva()"
+                class="bg-[#7A1A2E] hover:bg-[#5C1423] rounded-2xl p-5 text-white text-left transition transform hover:-translate-y-0.5 hover:shadow-lg">
+                <p class="text-[11px] font-bold uppercase tracking-wider">Acción</p>
+                <p class="text-2xl font-extrabold mt-1">Nueva reserva</p>
+                <p class="text-xs mt-1 opacity-80">Registrar un espacio</p>
+            </button>
+            <div class="bg-white border-2 border-[#7A1A2E] rounded-2xl p-5">
+                <p class="text-[11px] font-bold uppercase tracking-wider text-[#7A1A2E]">Disponibles</p>
+                <p id="metricaDisponibles" class="text-3xl font-extrabold text-[#7A1A2E] mt-1"><?= (int)$metricas['disponibles'] ?></p>
+                <p class="text-xs mt-1">Ocupadas: <?= (int)$metricas['ocupadas'] ?></p>
             </div>
-            <div class="bg-gradient-to-br from-green-900/60 to-green-800/40 border-2 border-green-500/50 rounded-2xl p-5 shadow-lg glow-green">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-green-300">Disponibles</p>
-                <p id="metricaDisponibles" class="text-3xl font-extrabold text-green-400 text-glow mt-1"><?= (int)$metricas['disponibles'] ?></p>
-                <p class="text-xs text-purple-300 mt-1">Ocupadas: <?= (int)$metricas['ocupadas'] ?> · Mant.: <?= (int)$metricas['enMantenimiento'] ?></p>
-            </div>
-            <div class="bg-gradient-to-br from-purple-900/60 to-purple-800/40 border-2 border-purple-500/50 rounded-2xl p-5 shadow-lg glow-purple">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-purple-300">Reservas</p>
-                <p id="metricaTotalReservas" class="text-3xl font-extrabold text-yellow-400 text-glow mt-1"><?= (int)$metricas['totalReservas'] ?></p>
-                <p class="text-xs text-purple-300 mt-1">Historial acumulado</p>
-            </div>
-            <div class="bg-gradient-to-br from-yellow-900/60 to-yellow-800/40 border-2 border-yellow-500/50 rounded-2xl p-5 shadow-lg glow-yellow">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-yellow-300">Pendientes</p>
-                <p id="metricaPendientes" class="text-3xl font-extrabold text-yellow-400 text-glow mt-1"><?= (int)$metricas['pendientes'] ?></p>
-                <p class="text-xs text-purple-300 mt-1">Confirmadas: <span id="metricaConfirmadas"><?= (int)$metricas['confirmadas'] ?></span> · En curso: <?= (int)$metricas['enCurso'] ?></p>
+            <button type="button" onclick="verReservasDelDia()"
+                class="bg-[#7A1A2E] hover:bg-[#5C1423] rounded-2xl p-5 text-white text-left transition transform hover:-translate-y-0.5 hover:shadow-lg">
+                <p class="text-[11px] font-bold uppercase tracking-wider">Acción</p>
+                <p class="text-2xl font-extrabold mt-1">Reporte del día</p>
+                <p class="text-xs mt-1 opacity-80">Ver y descargar PDF</p>
+            </button>
+            <div class="bg-white border-2 border-[#7A1A2E] rounded-2xl p-5">
+                <p class="text-[11px] font-bold uppercase tracking-wider text-[#7A1A2E]">Pendientes</p>
+                <p id="metricaPendientes" class="text-3xl font-extrabold text-[#7A1A2E] mt-1"><?= (int)$metricas['pendientes'] ?></p>
+                <p class="text-xs mt-1">Confirmadas: <span id="metricaConfirmadas"><?= (int)$metricas['confirmadas'] ?></span></p>
             </div>
         </div>
 
-        <div class="border-2 border-purple-500/50 rounded-2xl p-6 bg-slate-900/60 shadow-lg glow-purple">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="font-black tracking-wide chrome-text rounded-chrome text-sm flex items-center gap-2">
-                    <span>📝</span> Historial de reservas
-                </h3>
-                <span id="contadorRegistros" class="bg-slate-800 text-purple-300 font-bold text-xs px-3 py-1.5 rounded-xl border border-purple-500/50"><?= (int)$metricas['totalReservas'] ?> registros</span>
-            </div>
-            <div class="overflow-x-auto rounded-2xl border-2 border-purple-500/50 bg-slate-900/80 shadow-lg">
-                <table class="w-full text-sm text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gradient-to-r from-purple-900 to-purple-800 text-white font-bold text-xs uppercase tracking-wider">
-                            <th class="px-5 py-4">Responsable</th>
-                            <th class="px-5 py-4">Espacio</th>
-                            <th class="px-5 py-4">Fecha</th>
-                            <th class="px-5 py-4">Hora</th>
-                            <th class="px-5 py-4">Insumos / Recursos</th>
-                            <th class="px-5 py-4">Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaHistorialReservas" class="divide-y divide-purple-500/30 font-medium">
-                        <?php if (empty($reservas)): ?>
-                        <tr id="historialVacio">
-                            <td colspan="6" class="px-5 py-6 text-center italic text-purple-400">No hay reservas registradas todavía.</td>
-                        </tr>
-                        <?php else: ?>
-                            <?php foreach ($reservas as $reserva): ?>
-                            <tr class="hover:bg-purple-900/30 transition">
-                                <td class="px-5 py-4 font-bold text-white"><?= htmlspecialchars($reserva['responsable']) ?></td>
-                                <td class="px-5 py-4 text-purple-200"><?= htmlspecialchars($reserva['espacio']) ?></td>
-                                <td class="px-5 py-4 text-purple-200 whitespace-nowrap"><?= htmlspecialchars($reserva['fecha']) ?></td>
-                                <td class="px-5 py-4 text-purple-200 whitespace-nowrap"><?= htmlspecialchars($reserva['hora']) ?></td>
-                                <td class="px-5 py-4 text-purple-200 text-xs">
-                                    <?php if (empty($reserva['insumos'])): ?>
-                                        <span class="italic text-purple-400">Sin insumos</span>
-                                    <?php else: ?>
-                                        <div class="flex flex-wrap gap-1.5">
-                                            <?php foreach ($reserva['insumos'] as $insumo): ?>
-                                                <span class="bg-purple-900/60 text-purple-200 border border-purple-500/50 px-2 py-1 rounded-lg font-semibold"><?= htmlspecialchars($insumo) ?></span>
-                                            <?php endforeach; ?>
-                                        </div>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="px-5 py-4">
-                                    <span class="px-3 py-1.5 rounded-xl text-xs shadow-sm <?= estadoBadgeClass($reserva['estado']) ?>">
-                                        <?= htmlspecialchars($reserva['estado']) ?>
-                                    </span>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+        <div class="overflow-x-auto rounded-2xl border-2 border-[#7A1A2E]/40 mb-4">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="bg-[#7A1A2E] text-white text-xs uppercase">
+                        <th class="px-4 py-3 text-left">Espacio</th>
+                        <th class="px-4 py-3 text-left">Tipo</th>
+                        <th class="px-4 py-3 text-left">Piso</th>
+                        <th class="px-4 py-3 text-left">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($aulas as $aula): ?>
+                    <tr class="fila-aula border-t border-[#7A1A2E]/20" data-tipo="<?= htmlspecialchars($aula['tipo']) ?>" data-nombre="<?= htmlspecialchars($aula['nombre']) ?>" data-estado="<?= htmlspecialchars($aula['estado']) ?>">
+                        <td class="px-4 py-3 font-bold"><?= htmlspecialchars($aula['nombre']) ?></td>
+                        <td class="px-4 py-3"><?= htmlspecialchars($aula['tipo']) ?></td>
+                        <td class="px-4 py-3"><?= htmlspecialchars($aula['piso']) ?></td>
+                        <td class="px-4 py-3"><span class="px-2 py-1 rounded-lg text-xs <?= estadoBadgeClass($aula['estado']) ?>"><?= htmlspecialchars($aula['estado']) ?></span></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <?php require __DIR__ . '/partials/calendario.php'; ?>
+
+    <section class="bg-white backdrop-blur-xl rounded-3xl y2k-border glow-wine p-8 mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-black text-[#7A1A2E] text-sm">Historial de reservas</h3>
+            <span id="contadorRegistros" class="text-xs font-bold text-[#7A1A2E]"><?= (int)$metricas['totalReservas'] ?> registros</span>
+        </div>
+        <div class="overflow-x-auto rounded-2xl border-2 border-[#7A1A2E]/40">
+            <table class="w-full text-sm text-left">
+                <thead>
+                    <tr class="bg-[#7A1A2E] text-white text-xs uppercase">
+                        <th class="px-5 py-4">Responsable</th>
+                        <th class="px-5 py-4">Espacio</th>
+                        <th class="px-5 py-4">Actividad</th>
+                        <th class="px-5 py-4">Fecha</th>
+                        <th class="px-5 py-4">Horario</th>
+                        <th class="px-5 py-4">Insumos</th>
+                        <th class="px-5 py-4">Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaHistorialReservas" class="divide-y divide-[#C9A227]/20">
+                    <?php if (empty($reservas)): ?>
+                    <tr id="historialVacio"><td colspan="7" class="px-5 py-6 text-center italic text-[#7A1A2E]">Sin reservas.</td></tr>
+                    <?php else: foreach ($reservas as $reserva): ?>
+                    <tr>
+                        <td class="px-5 py-4 font-bold"><?= htmlspecialchars($reserva['responsable']) ?></td>
+                        <td class="px-5 py-4"><?= htmlspecialchars($reserva['espacio']) ?></td>
+                        <td class="px-5 py-4"><?= htmlspecialchars($reserva['actividad'] ?? '') ?></td>
+                        <td class="px-5 py-4 whitespace-nowrap"><?= htmlspecialchars($reserva['fecha']) ?></td>
+                        <td class="px-5 py-4 whitespace-nowrap"><?= htmlspecialchars(horarioReserva($reserva)) ?></td>
+                        <td class="px-5 py-4 text-xs">
+                            <?php if (empty($reserva['insumos'])): ?>
+                                <span class="italic text-[#7A1A2E]/70">Sin insumos</span>
+                            <?php else: foreach ($reserva['insumos'] as $insumo): ?>
+                                <span class="inline-block bg-[#7A1A2E]/70 border border-[#7A1A2E]/40 px-2 py-1 rounded-lg mr-1 mb-1"><?= htmlspecialchars($insumo) ?></span>
+                            <?php endforeach; endif; ?>
+                        </td>
+                        <td class="px-5 py-4"><span class="px-3 py-1.5 rounded-xl text-xs <?= estadoBadgeClass($reserva['estado']) ?>"><?= htmlspecialchars($reserva['estado']) ?></span></td>
+                    </tr>
+                    <?php endforeach; endif; ?>
+                </tbody>
+            </table>
         </div>
     </section>
 </main>
 
 <?php require __DIR__ . '/partials/modal.php'; ?>
-
-<script>
-function abrirModalReserva(espacio) {
-    if (espacio) {
-        document.getElementById('resEspacio').value = espacio;
-    }
-    document.getElementById('modalReserva').classList.remove('hidden');
-}
-
-function cerrarModalReserva() {
-    document.getElementById('modalReserva').classList.add('hidden');
-}
-
-function escapeHtml(texto) {
-    const div = document.createElement('div');
-    div.textContent = texto;
-    return div.innerHTML;
-}
-
-function renderInsumos(insumos) {
-    if (!insumos.length) {
-        return '<span class="italic text-purple-400">Sin insumos</span>';
-    }
-    return `<div class="flex flex-wrap gap-1.5">${insumos.map(item =>
-        `<span class="bg-purple-900/60 text-purple-200 border border-purple-500/50 px-2 py-1 rounded-lg font-semibold">${escapeHtml(item)}</span>`
-    ).join('')}</div>`;
-}
-
-function agregarFilaHistorial(reserva) {
-    const tbody = document.getElementById('tablaHistorialReservas');
-    const vacio = document.getElementById('historialVacio');
-    if (vacio) vacio.remove();
-
-    const tr = document.createElement('tr');
-    tr.className = 'hover:bg-purple-900/30 transition';
-    tr.innerHTML = `
-        <td class="px-5 py-4 font-bold text-white">${escapeHtml(reserva.responsable)}</td>
-        <td class="px-5 py-4 text-purple-200">${escapeHtml(reserva.espacio)}</td>
-        <td class="px-5 py-4 text-purple-200 whitespace-nowrap">${escapeHtml(reserva.fecha)}</td>
-        <td class="px-5 py-4 text-purple-200 whitespace-nowrap">${escapeHtml(reserva.hora)}</td>
-        <td class="px-5 py-4 text-purple-200 text-xs">${renderInsumos(reserva.insumos)}</td>
-        <td class="px-5 py-4">
-            <span class="px-3 py-1.5 rounded-xl text-xs shadow-sm bg-green-900/60 text-green-400 border border-green-500/50 font-bold">
-                ${escapeHtml(reserva.estado)}
-            </span>
-        </td>
-    `;
-    tbody.prepend(tr);
-}
-
-function incrementarMetrica(id) {
-    const nodo = document.getElementById(id);
-    if (!nodo) return;
-    nodo.textContent = String(parseInt(nodo.textContent, 10) + 1);
-}
-
-function guardarReserva(e) {
-    e.preventDefault();
-
-    const espacio = document.getElementById('resEspacio').value;
-    const fecha = document.getElementById('resFecha').value;
-    const horario = document.getElementById('resHorario').value;
-    const responsable = document.getElementById('resResponsable').value;
-    const insumos = Array.from(document.querySelectorAll('input[name="insumos[]"]:checked')).map(cb => cb.value);
-
-    agregarFilaHistorial({
-        responsable,
-        espacio,
-        fecha,
-        hora: horario,
-        estado: 'Confirmada',
-        insumos
-    });
-
-    incrementarMetrica('metricaTotalReservas');
-    incrementarMetrica('metricaConfirmadas');
-    const contador = document.getElementById('contadorRegistros');
-    const total = document.getElementById('metricaTotalReservas');
-    if (contador && total) {
-        contador.textContent = total.textContent + ' registros';
-    }
-
-    mostrarToast(`¡Reserva guardada con éxito para ${espacio}!`);
-    cerrarModalReserva();
-    e.target.reset();
-    return false;
-}
-
-function simularRecordatorio() {
-    mostrarToast('⏰ Alarma y notificación simulada enviada correctamente.');
-}
-
-let toastTimeout;
-function mostrarToast(mensaje) {
-    const toast = document.getElementById('toast');
-    const msg = document.getElementById('toastMsg');
-    msg.textContent = mensaje;
-    toast.classList.remove('hidden');
-    clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(() => toast.classList.add('hidden'), 4000);
-}
-</script>
-
+<?php require __DIR__ . '/partials/config-js.php'; ?>
 </body>
 </html>

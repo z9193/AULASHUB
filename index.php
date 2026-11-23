@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/models/Aula.php';
 require_once __DIR__ . '/models/Reserva.php';
+require_once __DIR__ . '/models/Usuario.php';
 require_once __DIR__ . '/controllers/AulaController.php';
 
 $controller = new AulaController();

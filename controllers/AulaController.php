@@ -4,39 +4,44 @@ class AulaController
 {
     private Aula $model;
     private Reserva $reservaModel;
+    private Usuario $usuarioModel;
 
     public function __construct()
     {
-        session_start();
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
         $this->model = new Aula();
         $this->reservaModel = new Reserva();
+        $this->usuarioModel = new Usuario();
     }
 
     public function login(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $usuario = $_POST['usuario'] ?? '';
+            $usuario = trim($_POST['usuario'] ?? '');
             $password = $_POST['password'] ?? '';
-            $rol = $_POST['rol'] ?? '';
+            $registro = $this->usuarioModel->autenticar($usuario, $password);
 
-            $credencialesValidas = [
-                'admin' => 'admin123',
-                'usuario' => 'usuario123',
-            ];
-
-            if (isset($credencialesValidas[$usuario]) && $credencialesValidas[$usuario] === $password) {
-                $_SESSION['usuario'] = $usuario;
-                $_SESSION['rol'] = $rol;
+            if ($registro) {
                 $_SESSION['autenticado'] = true;
+                $_SESSION['usuario'] = $registro['usuario'];
+                $_SESSION['nombre'] = $registro['nombre'];
+                $_SESSION['rol'] = $registro['rol'];
+                $_SESSION['horario_inicio'] = $registro['horario_inicio'];
+                $_SESSION['horario_fin'] = $registro['horario_fin'];
+                $_SESSION['requisitos'] = $registro['requisitos'];
+                $_SESSION['facultad'] = $registro['facultad'];
                 header('Location: ?action=index');
                 exit;
-            } else {
-                $error = 'Credenciales incorrectas. Por favor, intenta nuevamente.';
-                require __DIR__ . '/../views/login.php';
             }
-        } else {
+
+            $error = 'Credenciales incorrectas. Por favor, intenta nuevamente.';
             require __DIR__ . '/../views/login.php';
+            return;
         }
+
+        require __DIR__ . '/../views/login.php';
     }
 
     public function logout(): void
@@ -48,18 +53,28 @@ class AulaController
 
     public function index(): void
     {
-        if (!isset($_SESSION['autenticado']) || $_SESSION['autenticado'] !== true) {
+        if (empty($_SESSION['autenticado'])) {
             header('Location: ?action=login');
             exit;
         }
 
         $rol = $_SESSION['rol'] === 'admin' ? 'admin' : 'consulta';
-
+        $facultad = $this->model->obtenerFacultad();
         $aulas = $this->model->obtenerAulas();
-        $horarios = $this->model->obtenerHorarios();
+        $horas = $this->model->obtenerHoras();
         $insumosAuditorio = $this->model->obtenerInsumos();
         $horarioOperativo = $this->model->obtenerHorarioOperativo();
         $reservas = $this->reservaModel->obtenerReservas();
+        $usuarios = $this->usuarioModel->obtenerUsuarios();
+        $usuarioActual = [
+            'usuario' => $_SESSION['usuario'] ?? '',
+            'nombre' => $_SESSION['nombre'] ?? '',
+            'rol' => $rol,
+            'horario_inicio' => $_SESSION['horario_inicio'] ?? '07:00',
+            'horario_fin' => $_SESSION['horario_fin'] ?? '21:00',
+            'requisitos' => $_SESSION['requisitos'] ?? [],
+            'facultad' => $_SESSION['facultad'] ?? $facultad,
+        ];
 
         $contarPorEstado = function (array $items, string $estado): int {
             return count(array_filter($items, fn($item) => $item['estado'] === $estado));
