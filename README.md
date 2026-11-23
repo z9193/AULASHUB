@@ -1,60 +1,53 @@
-# AulasHub — Facultad de Contaduría y Administración
+# AulasHub
 
-Sistema de reserva de espacios (Aula Virtual, Auditorio y salas de juntas de 1er y 2do piso). Prototipo en PHP con MVC básico.
+Plataforma de gestión y reserva de espacios de la **Facultad de Contaduría y Administración (FCA)**. Permite consultar la disponibilidad de las salas, solicitar una reserva con horario definido y consultar o descargar la agenda del día.
 
-## 1. Requisitos e instalación (XAMPP)
+## Qué hace el proyecto
 
-**Requisitos:** XAMPP con Apache y PHP 8+. MySQL es opcional: la aplicación funciona con los datos de `models/` y no consulta las tablas todavía. Hace falta conexión a internet para Tailwind, fuentes y jsPDF (CDN).
+AulasHub concentra en un solo lugar la reserva de los espacios que la facultad usa con más frecuencia:
 
-1. Copia o extrae el proyecto en `C:\xampp\htdocs\AulasHub` (la carpeta debe llamarse `AulasHub`).
-2. Inicia **Apache** desde el panel de XAMPP.
-3. Abre [http://localhost/AulasHub/](http://localhost/AulasHub/) (con barra final). Debe mostrarse el inicio de sesión.
+- Auditorio
+- Aula Virtual
+- Sala de juntas — 1er piso
+- Sala de juntas — 2do piso
 
-Las cuentas de laboratorio se entregan por el responsable del proyecto; **no se documentan contraseñas aquí**.
+Docentes y personal administrativo entran a la plataforma, ven qué está libre y qué ya está ocupado, y registran una actividad con hora de inicio y hora de fin. El calendario muestra la actividad de cada sala, y el reporte del día resume las reservas para consulta o archivo.
 
-### Importación de base de datos / seeds (opcional)
+## Por qué es útil
 
-Cuando quieras dejar semilla MySQL para la rúbrica o una migración posterior:
+La reserva de espacios deja de depender de correos, listas o avisos dispersos. AulasHub ofrece:
 
-1. Inicia **MySQL** en XAMPP.
-2. En phpMyAdmin o consola, crea la base:
+- **Disponibilidad en tiempo real**, para saber qué sala está libre antes de solicitarla.
+- **Prevención de traslapes**, al validar que el horario no choque con otra reserva del mismo espacio.
+- **Indicadores visuales por sala**, para distinguir de un vistazo la ocupación de cada espacio.
+- **Agenda diaria**, para revisar las actividades programadas en la fecha elegida.
+- **Reporte del día en PDF**, listo para archivar o compartir en la gestión administrativa.
 
-```sql
-CREATE DATABASE aulashub CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE aulashub;
-```
+## Cómo comenzar
 
-3. Importa, en este orden: `seed/usuarios.sql`, `seed/espacios.sql`, `seed/insumos.sql`.
+El uso es el mismo para docentes y personal administrativo; cada perfil ve las opciones que le corresponden.
 
-Si ya tienes un dump (`aulashub-backup.sql`), impórtalo sobre esa base. El PHP actual **no lee** MySQL; los seeds son el esquema y los datos de respaldo.
+1. **Accede a la plataforma** con tu usuario institucional e inicia sesión.
+2. **Consulta la disponibilidad** por fecha y por sala en el directorio de espacios o en el calendario.
+3. **Solicita la reserva**: elige el espacio, indica la actividad, la fecha y las horas de inicio y fin, y confirma los datos.
+4. **Consulta o genera el reporte del día** y, si lo necesitas, descárgalo en PDF.
 
-## 2. Estructura general
+Para el detalle de cada pantalla (filtros, insumos y reportes), usa el [Manual de usuario](docs/manual-usuario.md).
 
-```
-AulasHub/
-  index.php          Enrutador (?action=login|index|logout)
-  controllers/       AulaController.php
-  models/            Espacios, reservas y usuarios de demostración
-  views/             login, consulta, admin y partials
-  public/            css/, js/, images/ (logo FCA)
-  seed/              usuarios.sql, espacios.sql, insumos.sql
-  docs/              Manuales, diagrama, presentación y checklist del zip
-```
+## Dónde obtener ayuda
 
-La carpeta `proyecto/` (si aparece) es un sistema anterior y **no** forma parte de AulasHub.
+- **[Manual de usuario](docs/manual-usuario.md)** — flujo de acceso, consulta, reservas y reportes.
+- **[Manual técnico](docs/manual-tecnico.md)** — descripción del sistema para quien da mantenimiento al proyecto.
 
-## 3. Seguridad al empaquetar la entrega
+Si el manual no resuelve la duda (acceso, un horario que no se puede reservar o un reporte), acude al área administrativa o académica de la Facultad de Contaduría y Administración que administra los espacios.
 
-No incluyas en el `.zip`:
+## Quién mantiene el proyecto
 
-- archivos `.env`, `credentials.json` u otros secretos
-- contraseñas de producción o de laboratorio en el README, diapositivas o capturas
-- carpeta `.git/` ni `proyecto/`
+AulasHub es desarrollado y mantenido por:
 
-Los seeds de laboratorio pueden contener claves de prueba. Si la rúbrica pide no incluir secretos, entrega solo la estructura SQL y el listado de usuarios **sin** columna de contraseña. Detalle en `docs/checklist-zip.md`.
+- **Alejandra Salazar** — LATIC, Universidad Autónoma de Chihuahua (UACH)
+- **Stephanie Esparza** — LATIC, Universidad Autónoma de Chihuahua (UACH)
 
-## Rutas y `http://localhost/AulasHub/`
+El mantenimiento consiste en conservar la información de espacios, horarios y reservas alineada con el uso real de la facultad, y en actualizar la documentación en `docs/` cuando cambie el flujo de uso.
 
-Los includes PHP usan `__DIR__` (relativos al archivo). CSS, JS, logo y redirecciones (`?action=login`, `?action=index`) son **rutas relativas** al directorio del proyecto, no rutas `C:\...` ni `/` desde la raíz del servidor.
-
-Usa la URL con el nombre de carpeta: `http://localhost/AulasHub/` o `http://localhost/AulasHub/index.php`. No abras archivos de `views/` directo en el navegador (romperían `public/css` y `public/js`).
+Para proponer un cambio, describe el ajuste (qué espacio, qué pantalla o qué regla de reserva) y compártelo con el equipo de LATIC o con el área responsable en la FCA, para revisarlo antes de incorporarlo.
